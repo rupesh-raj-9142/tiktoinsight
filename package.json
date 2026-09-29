@@ -1,0 +1,18 @@
+{
+  "name": "tiktok-insight-editor-apk-website",
+  "version": "1.0.0",
+  "description": "Minimalist, premium APK downloader landing site for TikTok Insight Editor APK",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve -l 3000 .",
+    "start": "npx serve -l 3000 .",
+    "serve": "npx serve -l 3000 ."
+  },
+  "keywords": [
+    "tiktok insight editor apk",
+    "apk downloader",
+    "tiktok analytics"
+  ],
+  "author": "TikTok Insight Labs",
+  "license": "MIT"
+}
