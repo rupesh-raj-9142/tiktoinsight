@@ -1,0 +1,6 @@
+# robots.txt for TikTok Insight Editor APK
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://tiktokinsighteditors.com/sitemap.xml
