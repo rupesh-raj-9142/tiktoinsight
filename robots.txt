@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://tiktokinsighteditors.com/sitemap.xml
+Sitemap: https://tiktoinsight.vercel.app/sitemap.xml
