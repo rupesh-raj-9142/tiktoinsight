@@ -85,12 +85,14 @@ let currentVersionTarget = 'v4.2.1';
 function openDownloadFlow(versionOrEvent = 'v4.2.1') {
   // If called from an event handler, allow event inspection
   if (versionOrEvent && typeof versionOrEvent === 'object' && versionOrEvent.preventDefault) {
-    versionOrEvent.preventDefault();
+    // We let the direct link or JS handle it
   } else if (typeof versionOrEvent === 'string') {
     currentVersionTarget = versionOrEvent;
   }
 
-  // NOTE: Never auto-trigger download on open. Give user choice between Web App and APK.
+  // Trigger client-side direct download immediately on click
+  directDownloadApk();
+
   const modal = document.getElementById('downloadModal');
   const phaseVerifying = document.getElementById('phaseVerifying');
   const phaseReady = document.getElementById('phaseReady');
@@ -123,7 +125,6 @@ function closeDownloadFlow() {
     modal.setAttribute('aria-hidden', 'true');
   }
   document.body.style.overflow = '';
-  document.documentElement.style.overflow = '';
   if (downloadTimer) clearInterval(downloadTimer);
 }
 
@@ -229,26 +230,15 @@ function scrollToElement(id) {
   }
 }
 
-// Global click outside to close modals (supports mobile touch & desktop click)
-['click', 'touchend'].forEach(evtType => {
-  window.addEventListener(evtType, (e) => {
-    const downloadModal = document.getElementById('downloadModal');
-    const infoModal = document.getElementById('infoModal');
-    const lbModal = document.getElementById('screenshotLightbox');
+// Global click outside to close modals
+window.addEventListener('click', (e) => {
+  const downloadModal = document.getElementById('downloadModal');
+  const infoModal = document.getElementById('infoModal');
+  const lbModal = document.getElementById('screenshotLightbox');
 
-    if (e.target === downloadModal) {
-      if (e.cancelable) e.preventDefault();
-      closeDownloadFlow();
-    }
-    if (e.target === infoModal) {
-      if (e.cancelable) e.preventDefault();
-      closeInfoModal();
-    }
-    if (e.target === lbModal || e.target?.classList?.contains('lightbox-backdrop')) {
-      if (e.cancelable) e.preventDefault();
-      closeLightbox();
-    }
-  }, { passive: false });
+  if (e.target === downloadModal) closeDownloadFlow();
+  if (e.target === infoModal) closeInfoModal();
+  if (e.target === lbModal || e.target?.classList?.contains('lightbox-backdrop')) closeLightbox();
 });
 
 // ESC key to close modals & Arrow navigation
