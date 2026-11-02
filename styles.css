@@ -3571,5 +3571,79 @@ a {
   }
 }
 
+/* ==========================================================================
+   MOBILE STICKY LAUNCH BAR (Direct Web App Access)
+   ========================================================================== */
+.mobile-launch-bar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-launch-bar {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 990;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  .mobile-launch-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .mobile-launch-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mobile-launch-badge {
+    background: rgba(0, 242, 254, 0.18);
+    color: #00F2FE;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 9999px;
+  }
+
+  .mobile-launch-title {
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 0.88rem;
+    letter-spacing: -0.01em;
+  }
+
+  .mobile-launch-btn {
+    background: linear-gradient(135deg, #00F2FE, #FE2C55);
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(254, 44, 85, 0.4);
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+
+  .mobile-launch-btn:active {
+    transform: scale(0.96);
+    filter: brightness(1.1);
+  }
+}
+
+
 
 

@@ -85,14 +85,12 @@ let currentVersionTarget = 'v4.2.1';
 function openDownloadFlow(versionOrEvent = 'v4.2.1') {
   // If called from an event handler, allow event inspection
   if (versionOrEvent && typeof versionOrEvent === 'object' && versionOrEvent.preventDefault) {
-    // We let the direct link or JS handle it
+    versionOrEvent.preventDefault();
   } else if (typeof versionOrEvent === 'string') {
     currentVersionTarget = versionOrEvent;
   }
 
-  // Trigger client-side direct download immediately on click
-  directDownloadApk();
-
+  // NOTE: Never auto-trigger download on open. Give user choice between Web App and APK.
   const modal = document.getElementById('downloadModal');
   const phaseVerifying = document.getElementById('phaseVerifying');
   const phaseReady = document.getElementById('phaseReady');

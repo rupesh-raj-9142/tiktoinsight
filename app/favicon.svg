@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- TikTok Glitch 3D Music Note -->
+  <!-- Cyan Layer Offset Left -->
+  <path d="M52 20 C52 20, 56 28, 68 32 C74 34, 80 34, 80 34 L80 44 C72 44, 64 40, 58 35 L58 64 C58 74, 50 82, 40 82 C30 82, 22 74, 22 64 C22 54, 30 46, 40 46 C43 46, 46 47, 48 48 L48 20 L52 20 Z" fill="#25F4EE" />
+  
+  <!-- Red/Pink Layer Offset Right -->
+  <path d="M56 20 C56 20, 60 28, 72 32 C78 34, 84 34, 84 34 L84 44 C76 44, 68 40, 62 35 L62 64 C62 74, 54 82, 44 82 C34 82, 26 74, 26 64 C26 54, 34 46, 44 46 C47 46, 50 47, 52 48 L52 20 L56 20 Z" fill="#FE2C55" />
+  
+  <!-- White Center Music Note (Overlay) -->
+  <path d="M54 20 C54 20, 58 28, 70 32 C76 34, 82 34, 82 34 L82 44 C74 44, 66 40, 60 35 L60 64 C60 74, 52 82, 42 82 C32 82, 24 74, 24 64 C24 54, 32 46, 42 46 C45 46, 48 47, 50 48 L50 20 L54 20 Z" fill="#FFFFFF" />
+</svg>
