@@ -125,6 +125,7 @@ function closeDownloadFlow() {
     modal.setAttribute('aria-hidden', 'true');
   }
   document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
   if (downloadTimer) clearInterval(downloadTimer);
 }
 
@@ -230,15 +231,26 @@ function scrollToElement(id) {
   }
 }
 
-// Global click outside to close modals
-window.addEventListener('click', (e) => {
-  const downloadModal = document.getElementById('downloadModal');
-  const infoModal = document.getElementById('infoModal');
-  const lbModal = document.getElementById('screenshotLightbox');
+// Global click outside to close modals (supports mobile touch & desktop click)
+['click', 'touchend'].forEach(evtType => {
+  window.addEventListener(evtType, (e) => {
+    const downloadModal = document.getElementById('downloadModal');
+    const infoModal = document.getElementById('infoModal');
+    const lbModal = document.getElementById('screenshotLightbox');
 
-  if (e.target === downloadModal) closeDownloadFlow();
-  if (e.target === infoModal) closeInfoModal();
-  if (e.target === lbModal || e.target?.classList?.contains('lightbox-backdrop')) closeLightbox();
+    if (e.target === downloadModal) {
+      if (e.cancelable) e.preventDefault();
+      closeDownloadFlow();
+    }
+    if (e.target === infoModal) {
+      if (e.cancelable) e.preventDefault();
+      closeInfoModal();
+    }
+    if (e.target === lbModal || e.target?.classList?.contains('lightbox-backdrop')) {
+      if (e.cancelable) e.preventDefault();
+      closeLightbox();
+    }
+  }, { passive: false });
 });
 
 // ESC key to close modals & Arrow navigation
