@@ -191,13 +191,6 @@ function openTermsModal() {
   `);
 }
 
-function openDmcaModal() {
-  openInfoModal('DMCA & Trademark Disclaimer', `
-    <p><strong>Trademark Notice:</strong> TikTok™ is a trademark of ByteDance Ltd. TikTok Insight Editor is an independent utility and is not affiliated with, endorsed by, or sponsored by ByteDance Ltd.</p>
-    <p><strong>DMCA Compliance:</strong> We respect intellectual property rights. If you believe any material hosted on this domain infringes your copyright, please contact our legal desk for immediate notice processing within 24 hours.</p>
-  `);
-}
-
 // Interactive Live Charts
 function initLiveBarAnimations() {
   const bars = document.querySelectorAll('.chart-bar-group .c-bar');
@@ -245,3 +238,16 @@ window.addEventListener('keydown', (e) => {
     closeInfoModal();
   }
 });
+
+// Fast Copy Telegram Handle
+function copyTelegramHandle() {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText('@JARVIS75').then(() => {
+      showToast('Copied @JARVIS75 to clipboard!');
+    }).catch(() => {
+      showToast('Telegram handle: @JARVIS75');
+    });
+  } else {
+    showToast('Telegram handle: @JARVIS75');
+  }
+}
