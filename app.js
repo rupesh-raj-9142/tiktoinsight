@@ -1,11 +1,12 @@
 /**
  * TikTok Insight Editor APK - Core Client Logic
- * Handles safe verified downloads, hash copying, modal management & micro-interactions
+ * Seamless download management, screen-locked modals & responsive interactions
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   initLiveBarAnimations();
   initNavScrollEffect();
+  initModalListeners();
 });
 
 // Toast Notification Engine
@@ -21,7 +22,7 @@ function showToast(message) {
   if (toastTimeout) clearTimeout(toastTimeout);
   toastTimeout = setTimeout(() => {
     toast.classList.remove('show');
-  }, 3500);
+  }, 4000);
 }
 
 // Copy SHA-256 Hash to Clipboard
@@ -57,64 +58,90 @@ function fallbackCopyText(text) {
 }
 
 // ==========================================================================
-// DIRECT CLIENT-SIDE APK DOWNLOAD ENGINE (100% GitHub Releases CDN, 0% Vercel Bandwidth)
+// SEAMLESS IN-PAGE APK DOWNLOAD ENGINE
+// Stays on screen without external browser navigation or page leaves
 // ==========================================================================
 const OFFICIAL_APK_DOWNLOAD_URL = 'https://github.com/rupesh-raj-9142/tiktok-insight-editor/releases/download/download/tiktok.insight.editor.apk';
 
 /**
- * Triggers direct client-side APK download from GitHub Releases.
- * Stream travels directly from GitHub CDN to user device, bypassing Vercel completely.
+ * Initiates the APK binary download in the background via hidden iframe & anchor
+ * Keeps user strictly on the website screen without tab jumps or navigation away.
  */
 function directDownloadApk() {
-  const downloadAnchor = document.createElement('a');
-  downloadAnchor.href = OFFICIAL_APK_DOWNLOAD_URL;
-  downloadAnchor.setAttribute('download', 'tiktok.insight.editor.apk');
-  downloadAnchor.setAttribute('rel', 'noopener noreferrer');
-  document.body.appendChild(downloadAnchor);
-  downloadAnchor.click();
-  document.body.removeChild(downloadAnchor);
+  showToast('Starting direct download: tiktok.insight.editor.apk (48.2 MB)...');
 
-  showToast('Starting direct APK download from official GitHub CDN...');
+  // Method 1: Invisible download iframe (industry standard for in-page binary downloads)
+  let iframe = document.getElementById('apkDownloadIframe');
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.id = 'apkDownloadIframe';
+    iframe.style.display = 'none';
+    iframe.style.width = '0px';
+    iframe.style.height = '0px';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+  }
+  iframe.src = OFFICIAL_APK_DOWNLOAD_URL;
+
+  // Method 2: Programmatic anchor download fallback
+  try {
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.href = OFFICIAL_APK_DOWNLOAD_URL;
+    downloadAnchor.setAttribute('download', 'tiktok.insight.editor.apk');
+    downloadAnchor.style.display = 'none';
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    setTimeout(() => {
+      if (downloadAnchor.parentNode) {
+        document.body.removeChild(downloadAnchor);
+      }
+    }, 1000);
+  } catch (e) {
+    console.warn('Direct anchor fallback:', e);
+  }
+}
+
+/**
+ * Universal click handler for all download buttons across the site.
+ * Cancels default URL navigation so the user NEVER leaves the page.
+ */
+function handleDownloadClick(event, version = 'v4.2.1') {
+  if (event) {
+    if (typeof event.preventDefault === 'function') event.preventDefault();
+    if (typeof event.stopPropagation === 'function') event.stopPropagation();
+  }
+  openDownloadFlow(event, version);
+  return false;
 }
 
 // Download Flow Controller
-let downloadTimer = null;
 let currentVersionTarget = 'v4.2.1';
 
-function openDownloadFlow(versionOrEvent = 'v4.2.1') {
-  // If called from an event handler, allow event inspection
-  if (versionOrEvent && typeof versionOrEvent === 'object' && versionOrEvent.preventDefault) {
-    // We let the direct link or JS handle it
-  } else if (typeof versionOrEvent === 'string') {
-    currentVersionTarget = versionOrEvent;
+function openDownloadFlow(eventOrVersion, versionTarget) {
+  if (eventOrVersion && typeof eventOrVersion.preventDefault === 'function') {
+    eventOrVersion.preventDefault();
+  }
+  if (typeof versionTarget === 'string') {
+    currentVersionTarget = versionTarget;
+  } else if (typeof eventOrVersion === 'string') {
+    currentVersionTarget = eventOrVersion;
   }
 
-  // Trigger client-side direct download immediately on click
+  // Trigger seamless background download
   directDownloadApk();
 
   const modal = document.getElementById('downloadModal');
-  const phaseVerifying = document.getElementById('phaseVerifying');
-  const phaseReady = document.getElementById('phaseReady');
-  const filenameElem = document.getElementById('modalFilename');
-  const actualLink = document.getElementById('actualDownloadLink');
+  if (!modal) return;
 
+  const filenameElem = document.getElementById('modalFilename');
   if (filenameElem) {
     filenameElem.textContent = 'tiktok.insight.editor.apk';
   }
-  if (actualLink) {
-    actualLink.href = OFFICIAL_APK_DOWNLOAD_URL;
-  }
 
-  if (!modal) return;
-
-  // Show the confirmation & quick-install phase immediately
-  if (phaseVerifying) phaseVerifying.classList.add('hidden');
-  if (phaseReady) phaseReady.classList.remove('hidden');
-
-  // Open modal with install directions
+  // Open modal centered cleanly inside the screen viewport
   modal.classList.add('active');
   modal.setAttribute('aria-hidden', 'false');
-  document.body.style.overflow = 'hidden';
+  document.body.classList.add('modal-open');
 }
 
 function closeDownloadFlow() {
@@ -123,17 +150,22 @@ function closeDownloadFlow() {
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
   }
-  document.body.style.overflow = '';
-  if (downloadTimer) clearInterval(downloadTimer);
+  document.body.classList.remove('modal-open');
 }
 
-// Trigger simulated or direct safe APK package download file
-function triggerActualDownload(e) {
-  if (e && e.preventDefault) e.preventDefault();
+function retryDownloadFromModal() {
   directDownloadApk();
+  showToast('Re-downloading package from GitHub CDN...');
 }
 
-// Info Modals (Privacy, Terms, DMCA, VirusTotal)
+function handleBackdropClick(e) {
+  if (e.target && e.target.classList.contains('modal-backdrop')) {
+    closeDownloadFlow();
+    closeInfoModal();
+  }
+}
+
+// Info Modals (Privacy, Terms, VirusTotal)
 function openInfoModal(title, htmlContent) {
   const modal = document.getElementById('infoModal');
   const body = document.getElementById('infoModalBody');
@@ -148,7 +180,7 @@ function openInfoModal(title, htmlContent) {
 
   modal.classList.add('active');
   modal.setAttribute('aria-hidden', 'false');
-  document.body.style.overflow = 'hidden';
+  document.body.classList.add('modal-open');
 }
 
 function closeInfoModal() {
@@ -157,7 +189,7 @@ function closeInfoModal() {
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
   }
-  document.body.style.overflow = '';
+  document.body.classList.remove('modal-open');
 }
 
 function openVirusModal() {
@@ -174,7 +206,6 @@ function openVirusModal() {
 
 function openPrivacyModal() {
   openInfoModal('Privacy Policy', `
-    <p>Last updated: September 2026</p>
     <p>We respect your privacy. The <strong>TikTok Insight Editor APK</strong> portal does not collect, sell, or rent your personal data to third parties.</p>
     <ul>
       <li><strong>No Account Required:</strong> You do not need an account or email to download APK files.</li>
@@ -189,6 +220,32 @@ function openTermsModal() {
     <p>By downloading or utilizing <strong>TikTok Insight Editor APK</strong>, you agree to use the utility strictly for legitimate content creation and video analytics purposes in adherence to all applicable laws.</p>
     <p>This software is provided "as is" without warranties of any kind. You are responsible for complying with the community guidelines of platforms where you publish your created content.</p>
   `);
+}
+
+// Modal Listeners
+function initModalListeners() {
+  // ESC key closes modals
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeDownloadFlow();
+      closeInfoModal();
+    }
+  });
+
+  // Backdrop click listener
+  const downloadModal = document.getElementById('downloadModal');
+  const infoModal = document.getElementById('infoModal');
+
+  if (downloadModal) {
+    downloadModal.addEventListener('click', (e) => {
+      if (e.target === downloadModal) closeDownloadFlow();
+    });
+  }
+  if (infoModal) {
+    infoModal.addEventListener('click', (e) => {
+      if (e.target === infoModal) closeInfoModal();
+    });
+  }
 }
 
 // Interactive Live Charts
@@ -221,23 +278,6 @@ function scrollToElement(id) {
     element.scrollIntoView({ behavior: 'smooth' });
   }
 }
-
-// Global click outside to close modals
-window.addEventListener('click', (e) => {
-  const downloadModal = document.getElementById('downloadModal');
-  const infoModal = document.getElementById('infoModal');
-
-  if (e.target === downloadModal) closeDownloadFlow();
-  if (e.target === infoModal) closeInfoModal();
-});
-
-// ESC key to close modals
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    closeDownloadFlow();
-    closeInfoModal();
-  }
-});
 
 // Fast Copy Telegram Handle
 function copyTelegramHandle() {
